@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  ros-dev:
+    build: .
+    container_name: ros_docker_dev
+    volumes:
+      # Mount current directory to /workspace in container
+      - .:/workspace
+      # Optional: Mount additional directories if needed
+      # - ./src:/workspace/src
+      # - ./config:/workspace/config
+    environment:
+      - DISPLAY=${DISPLAY}
+    network_mode: host
+    privileged: true
+    stdin_open: true
+    tty: true
+    # For X11 forwarding (if needed for GUI applications)
+    # volumes:
+    #   - /tmp/.X11-unix:/tmp/.X11-unix:rw 
