@@ -2,5 +2,10 @@ fanciswarm dev
 
 wheatfox 2025
 
-https://github.com/fancinnov/fcu_core
+git clone https://github.com/enkerewpo/fcu_core
+git clone https://github.com/enkerewpo/quadrotor_msgs
 
+apt install \
+    ros-noetic-serial \
+    ros-noetic-image-transport \
+    ros-noetic-tf
