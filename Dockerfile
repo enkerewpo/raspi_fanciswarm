@@ -26,7 +26,7 @@ RUN echo "source /opt/ros/noetic/setup.bash" >> /root/.bashrc
 RUN apt-get update && apt-get install -y python3-rosdep && \
     rosdep init || true && \
     rosdep update && \
-    apt-get install ros-noetic-serial ros-neotic-image-transport ros-neotic-tf
+    apt-get install -y ros-noetic-serial ros-noetic-image-transport ros-noetic-tf
 
 # Create shared workspace directory
 RUN mkdir -p /workspace

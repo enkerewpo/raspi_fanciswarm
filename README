@@ -2,8 +2,13 @@ fanciswarm dev
 
 wheatfox 2025
 
+
+mkdir ws && cd ws
+mkdir src && cd src
 git clone https://github.com/enkerewpo/fcu_core
 git clone https://github.com/enkerewpo/quadrotor_msgs
+cd ..
+catkin_make
 
 apt install \
     ros-noetic-serial \
