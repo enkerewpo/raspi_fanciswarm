@@ -9,3 +9,4 @@ apt install \
     ros-noetic-serial \
     ros-noetic-image-transport \
     ros-noetic-tf
+
