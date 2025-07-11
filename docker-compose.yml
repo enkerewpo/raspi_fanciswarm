@@ -1,21 +1,34 @@
 version: '3.8'
 
+# Environment variables for configuration
+# Usage: ROS_VERSION=ros1 COMMAND="roslaunch fcu_core fcu_core.launch" docker-compose up
+# Or: ROS_VERSION=ros2 COMMAND="ros2 launch fcu_core fcu_core.launch" docker-compose up
+
 services:
   ros-dev:
-    build: .
-    container_name: ros_docker_dev
+    build:
+      context: .
+      dockerfile: Dockerfile.${ROS_VERSION:-ros1}
+    container_name: ros_${ROS_VERSION:-ros1}_dev
     volumes:
       # Mount current directory to /workspace in container
       - .:/workspace
+      # Mount ROS workspace based on version
+      - ./${ROS_WORKSPACE:-ros1_workspace}:/workspace/${ROS_WORKSPACE:-ros1_workspace}
       # Optional: Mount additional directories if needed
       # - ./src:/workspace/src
       # - ./config:/workspace/config
     environment:
       - DISPLAY=${DISPLAY}
+      - ROS_VERSION=${ROS_VERSION:-ros1}
+      - ROS_WORKSPACE=${ROS_WORKSPACE:-ros1_workspace}
+      - ROS_DISTRO=${ROS_DISTRO:-noetic}
     network_mode: host
     privileged: true
     stdin_open: true
     tty: true
+    # Override command if specified
+    command: ${COMMAND:-/bin/bash}
     # For X11 forwarding (if needed for GUI applications)
     # volumes:
     #   - /tmp/.X11-unix:/tmp/.X11-unix:rw 

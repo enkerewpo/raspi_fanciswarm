@@ -1,0 +1,6 @@
+[submodule "ros1_workspace/src/fcu_core"]
+	path = ros1_workspace/src/fcu_core
+	url = https://github.com/enkerewpo/fcu_core
+[submodule "ros1_workspace/src/quadrotor_msgs"]
+	path = ros1_workspace/src/quadrotor_msgs
+	url = https://github.com/enkerewpo/quadrotor_msgs
