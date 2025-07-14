@@ -13,8 +13,8 @@ ROS_WORKSPACE=${ROS_WORKSPACE:-$DEFAULT_ROS_WORKSPACE}
 COMMAND=${COMMAND:-$DEFAULT_COMMAND}
 
 # Image and container names based on ROS version
-IMAGE_NAME="ros-${ROS_VERSION}-${ROS_DISTRO}-tools"
-CONTAINER_NAME="ros-${ROS_VERSION}-${ROS_DISTRO}"
+IMAGE_NAME="${ROS_VERSION}-${ROS_DISTRO}-image"
+CONTAINER_NAME="${ROS_VERSION}-${ROS_DISTRO}-container"
 
 function show_config() {
     echo "=== Current Configuration ==="
