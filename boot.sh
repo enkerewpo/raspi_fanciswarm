@@ -6,6 +6,16 @@ DEFAULT_ROS_DISTRO="noetic"
 DEFAULT_ROS_WORKSPACE="ros1_workspace"
 DEFAULT_COMMAND="/bin/bash"
 
+if [[ "$(uname)" == "Darwin" ]]; then
+    open -a XQuartz
+    xhost + 127.0.0.1
+    DISPLAY_ENV="-e DISPLAY=host.docker.internal:0"
+    X11_SOCKET_MOUNT="-v /tmp/.X11-unix:/tmp/.X11-unix"
+else
+    DISPLAY_ENV=""
+    X11_SOCKET_MOUNT=""
+fi
+
 # Parse command line arguments
 ROS_VERSION=${ROS_VERSION:-$DEFAULT_ROS_VERSION}
 ROS_DISTRO=${ROS_DISTRO:-$DEFAULT_ROS_DISTRO}
@@ -17,14 +27,14 @@ IMAGE_NAME="${ROS_VERSION}-${ROS_DISTRO}-image"
 CONTAINER_NAME="${ROS_VERSION}-${ROS_DISTRO}-container"
 
 function show_config() {
-    echo "=== Current Configuration ==="
+    echo "========================= Current Configuration =========================="
     echo "ROS Version: $ROS_VERSION"
     echo "ROS Distro: $ROS_DISTRO"
     echo "ROS Workspace: $ROS_WORKSPACE"
     echo "Command: $COMMAND"
     echo "Image Name: $IMAGE_NAME"
     echo "Container Name: $CONTAINER_NAME"
-    echo "=============================="
+    echo "=========================================================================="
 }
 
 function build_image() {
@@ -34,16 +44,29 @@ function build_image() {
 }
 
 function start_container() {
+    if [[ "$(uname)" == "Darwin" ]]; then
+        if ! pgrep -xq -- "XQuartz"; then
+            open -a XQuartz
+            sleep 2
+        fi
+        xhost + 127.0.0.1
+        DISPLAY_ENV="-e DISPLAY=host.docker.internal:0"
+        X11_SOCKET_MOUNT="-v /tmp/.X11-unix:/tmp/.X11-unix"
+    else
+        DISPLAY_ENV=""
+        X11_SOCKET_MOUNT=""
+    fi
     echo "Starting Docker container: $CONTAINER_NAME..."
     echo "Command: $COMMAND"
     sudo docker run -it --name $CONTAINER_NAME \
         --network host \
         -v $(pwd):/workspace \
         -v $(pwd)/${ROS_WORKSPACE}:/workspace/${ROS_WORKSPACE} \
+        $X11_SOCKET_MOUNT \
+        $DISPLAY_ENV \
         -e ROS_VERSION=$ROS_VERSION \
         -e ROS_DISTRO=$ROS_DISTRO \
         -e ROS_WORKSPACE=$ROS_WORKSPACE \
-        -e DISPLAY=$DISPLAY \
         --privileged \
         $IMAGE_NAME $COMMAND
 }
