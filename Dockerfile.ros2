@@ -1,8 +1,5 @@
-# ROS2 Humble for Raspberry Pi (ARM64) - wheatfox
 FROM arm64v8/ros:humble
-
 ENV DEBIAN_FRONTEND=noninteractive
-
 RUN apt-get update && apt-get install -y \
     git \
     vim \
@@ -21,19 +18,13 @@ RUN apt-get update && apt-get install -y \
     python3-wstool \
     python3-rosinstall \
     && rm -rf /var/lib/apt/lists/*
-
 RUN locale-gen en_US.UTF-8
 ENV LANG=en_US.UTF-8
 ENV LANGUAGE=en_US:en
 ENV LC_ALL=en_US.UTF-8
-
 RUN echo "source /opt/ros/humble/setup.bash" >> /root/.bashrc
-
-# Initialize rosdep
 RUN rosdep init || true && \
     rosdep update
-
-# Install common ROS2 packages
 RUN apt-get update && apt-get install -y \
     ros-humble-serial-driver \
     ros-humble-image-transport \
@@ -45,14 +36,7 @@ RUN apt-get update && apt-get install -y \
     ros-humble-camera-calibration-parsers \
     ros-humble-camera-info-manager \
     && rm -rf /var/lib/apt/lists/*
-
-# Create shared workspace directory
 RUN mkdir -p /workspace
-
-# Set working directory to shared workspace
 WORKDIR /workspace
-
-# Define volume for workspace sharing
 VOLUME ["/workspace"]
-
 CMD ["/bin/bash"] 
