@@ -3,3 +3,4 @@ devel
 include_generated
 compile_commands.json
 .clangd
+src/CMakeLists.txt
