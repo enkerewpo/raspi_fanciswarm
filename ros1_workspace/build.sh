@@ -1,3 +1,4 @@
 #!/bin/bash
 set -e
-catkin_make
+rm -rf build devel
+bear catkin_make
