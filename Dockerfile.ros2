@@ -1,4 +1,4 @@
-FROM arm64v8/ros:humble
+FROM ros:humble
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
     git \
@@ -36,6 +36,17 @@ RUN apt-get update && apt-get install -y \
     ros-humble-vision-opencv \
     ros-humble-camera-calibration-parsers \
     ros-humble-camera-info-manager \
+    ros-humble-rviz2 \
+    ros-humble-octomap \
+    ros-humble-octomap-msgs \
+    ros-humble-octomap-ros \
+    ros-humble-octomap-rviz-plugins \
+    ros-humble-geometry-msgs \
+    ros-humble-nav-msgs \
+    ros-humble-sensor-msgs \
+    ros-humble-std-msgs \
+    ros-humble-rclcpp \
+    ros-humble-rclpy \
     && rm -rf /var/lib/apt/lists/*
 RUN mkdir -p /workspace
 WORKDIR /workspace

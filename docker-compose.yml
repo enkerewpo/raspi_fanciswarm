@@ -15,20 +15,126 @@ services:
       - .:/workspace
       # Mount ROS workspace based on version
       - ./${ROS_WORKSPACE:-ros1_workspace}:/workspace/${ROS_WORKSPACE:-ros1_workspace}
-      # Optional: Mount additional directories if needed
-      # - ./src:/workspace/src
-      # - ./config:/workspace/config
+      # Mount ROS logs to workspace for host access
+      - ./${ROS_WORKSPACE:-ros1_workspace}/ros_logs:/root/.ros/log
+      # X11 forwarding for GUI applications
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
     environment:
       - DISPLAY=${DISPLAY}
       - ROS_VERSION=${ROS_VERSION:-ros1}
       - ROS_WORKSPACE=${ROS_WORKSPACE:-ros1_workspace}
       - ROS_DISTRO=${ROS_DISTRO:-noetic}
+      - DISABLE_ROS1_EOL_WARNINGS=1
     network_mode: host
     privileged: true
     stdin_open: true
     tty: true
     # Override command if specified
     command: ${COMMAND:-/bin/bash}
-    # For X11 forwarding (if needed for GUI applications)
-    # volumes:
-    #   - /tmp/.X11-unix:/tmp/.X11-unix:rw 
+    # NVIDIA runtime for GPU acceleration
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  fcu-core:
+    build:
+      context: .
+      dockerfile: Dockerfile.${ROS_VERSION:-ros1}
+    container_name: fcu_core_${ROS_VERSION:-ros1}
+    volumes:
+      - .:/workspace
+      - ./${ROS_WORKSPACE:-ros1_workspace}:/workspace/${ROS_WORKSPACE:-ros1_workspace}
+      # Mount ROS logs to workspace for host access
+      - ./${ROS_WORKSPACE:-ros1_workspace}/ros_logs:/root/.ros/log
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    environment:
+      - DISPLAY=${DISPLAY}
+      - ROS_VERSION=${ROS_VERSION:-ros1}
+      - ROS_WORKSPACE=${ROS_WORKSPACE:-ros1_workspace}
+      - ROS_DISTRO=${ROS_DISTRO:-noetic}
+      - DISABLE_ROS1_EOL_WARNINGS=1
+    network_mode: host
+    privileged: true
+    depends_on:
+      - ros-dev
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    command: >
+      bash -c "
+        sleep 5 &&
+        cd /workspace/${ROS_WORKSPACE:-ros1_workspace} &&
+        source /opt/ros/${ROS_DISTRO:-noetic}/setup.bash &&
+        echo 'Building workspace...' &&
+        rm -rf build devel &&
+        catkin_make &&
+        source devel/setup.bash &&
+        echo 'Starting FCU core...' &&
+        if [ '${ROS_VERSION:-ros1}' = 'ros1' ]; then
+          roslaunch fcu_core fcu_core_server.launch rviz:=false 2>&1 | tee /tmp/ros_logs.txt
+        else
+          echo 'ROS2 version not available yet'
+          sleep infinity
+        fi
+      "
+
+  rviz:
+    build:
+      context: .
+      dockerfile: Dockerfile.${ROS_VERSION:-ros1}
+    container_name: rviz_${ROS_VERSION:-ros1}
+    volumes:
+      - .:/workspace
+      - ./${ROS_WORKSPACE:-ros1_workspace}:/workspace/${ROS_WORKSPACE:-ros1_workspace}
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    environment:
+      - DISPLAY=${DISPLAY}
+      - ROS_VERSION=${ROS_VERSION:-ros1}
+      - ROS_WORKSPACE=${ROS_WORKSPACE:-ros1_workspace}
+      - ROS_DISTRO=${ROS_DISTRO:-noetic}
+      - DISABLE_ROS1_EOL_WARNINGS=1
+      - LIBGL_ALWAYS_SOFTWARE=1
+      - QT_X11_NO_MITSHM=1
+      - XDG_RUNTIME_DIR=/tmp/runtime-root
+    network_mode: host
+    privileged: true
+    depends_on:
+      - fcu-core
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    command: >
+      bash -c "
+        sleep 15 &&
+        mkdir -p /tmp/runtime-root &&
+        chmod 700 /tmp/runtime-root &&
+        cd /workspace/${ROS_WORKSPACE:-ros1_workspace} &&
+        source /opt/ros/${ROS_DISTRO:-noetic}/setup.bash &&
+        echo 'Waiting for workspace build...' &&
+        while [ ! -f devel/setup.bash ]; do sleep 1; done &&
+        source devel/setup.bash &&
+        echo 'Starting RViz...' &&
+        if [ '${ROS_VERSION:-ros1}' = 'ros1' ]; then
+          export LIBGL_ALWAYS_SOFTWARE=1 &&
+          export XDG_RUNTIME_DIR=/tmp/runtime-root &&
+          rviz -d src/fcu_core/rviz_cfg/fcu_core.rviz
+        else
+          echo 'ROS2 version not available yet'
+          sleep infinity
+        fi
+      " 

@@ -11,6 +11,11 @@ if [[ "$(uname)" == "Darwin" ]]; then
     xhost + 127.0.0.1
     DISPLAY_ENV="-e DISPLAY=host.docker.internal:0"
     X11_SOCKET_MOUNT="-v /tmp/.X11-unix:/tmp/.X11-unix"
+elif [[ "$(uname)" == "Linux" ]]; then
+    # For Linux (including Debian 12), enable X11 forwarding
+    xhost +local:docker
+    DISPLAY_ENV="-e DISPLAY=$DISPLAY"
+    X11_SOCKET_MOUNT="-v /tmp/.X11-unix:/tmp/.X11-unix:rw"
 else
     DISPLAY_ENV=""
     X11_SOCKET_MOUNT=""
@@ -52,6 +57,11 @@ function start_container() {
         xhost + 127.0.0.1
         DISPLAY_ENV="-e DISPLAY=host.docker.internal:0"
         X11_SOCKET_MOUNT="-v /tmp/.X11-unix:/tmp/.X11-unix"
+    elif [[ "$(uname)" == "Linux" ]]; then
+        # For Linux (including Debian 12), enable X11 forwarding
+        xhost +local:docker
+        DISPLAY_ENV="-e DISPLAY=$DISPLAY"
+        X11_SOCKET_MOUNT="-v /tmp/.X11-unix:/tmp/.X11-unix:rw"
     else
         DISPLAY_ENV=""
         X11_SOCKET_MOUNT=""
