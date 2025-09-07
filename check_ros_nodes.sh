@@ -46,12 +46,8 @@ fi
 # Check ROS logs
 echo ""
 echo "Recent ROS Logs:"
-if [ -f /tmp/ros_logs.txt ]; then
-    echo "Last 10 lines from ROS logs:"
-    tail -10 /tmp/ros_logs.txt
-else
-    echo "No ROS logs found at /tmp/ros_logs.txt"
-fi
+echo "Note: ROS logs are now displayed directly in the terminal without duplication"
+echo "For detailed logs, check the ROS log directory below"
 
 # Check ROSout logs (actual ROS node output)
 echo ""

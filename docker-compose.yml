@@ -81,7 +81,7 @@ services:
         source devel/setup.bash &&
         echo 'Starting FCU core...' &&
         if [ '${ROS_VERSION:-ros1}' = 'ros1' ]; then
-          roslaunch fcu_core fcu_core_server.launch rviz:=false 2>&1 | tee /tmp/ros_logs.txt
+          roslaunch fcu_core fcu_core_server.launch rviz:=false
         else
           echo 'ROS2 version not available yet'
           sleep infinity
