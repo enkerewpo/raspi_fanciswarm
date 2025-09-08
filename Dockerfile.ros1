@@ -14,6 +14,8 @@ RUN apt-get update && apt-get install -y \
     locales \
     cmake \
     libeigen3-dev \
+    libjsoncpp-dev \
+    pkg-config \
     && rm -rf /var/lib/apt/lists/*
 RUN locale-gen en_US.UTF-8
 ENV LANG=en_US.UTF-8

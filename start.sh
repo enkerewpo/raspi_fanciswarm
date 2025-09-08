@@ -43,3 +43,5 @@ ROS_WORKSPACE=$ROS_WORKSPACE \
 docker compose up
 
 echo "Physical drone control environment stopped."
+
+# docker-compose up --build

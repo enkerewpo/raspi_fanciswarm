@@ -76,7 +76,6 @@ services:
         cd /workspace/${ROS_WORKSPACE:-ros1_workspace} &&
         source /opt/ros/${ROS_DISTRO:-noetic}/setup.bash &&
         echo 'Building workspace...' &&
-        rm -rf build devel &&
         catkin_make &&
         source devel/setup.bash &&
         echo 'Starting FCU core...' &&
