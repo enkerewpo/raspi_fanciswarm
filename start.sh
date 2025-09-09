@@ -28,7 +28,6 @@ echo "========================= Physical Drone Configuration ===================
 echo "ROS Version: $ROS_VERSION"
 echo "ROS Distro: $ROS_DISTRO"
 echo "ROS Workspace: $ROS_WORKSPACE"
-echo "Target: Physical Drone Control"
 echo "=========================================================================="
 
 # Enable X11 forwarding for Debian 12
