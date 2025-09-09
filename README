@@ -15,3 +15,8 @@ apt install \
     ros-noetic-image-transport \
     ros-noetic-tf
 
+
+macos xserver
+
+xhost +$(hostname)
+export DISPLAY=:0

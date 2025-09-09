@@ -21,7 +21,7 @@ services:
       # X11 forwarding for GUI applications (macOS)
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
     environment:
-      - DISPLAY=${DISPLAY:-host.docker.internal:0}
+      - DISPLAY=host.docker.internal:0
       - ROS_VERSION=${ROS_VERSION:-ros1}
       - ROS_WORKSPACE=${ROS_WORKSPACE:-ros1_workspace}
       - ROS_DISTRO=${ROS_DISTRO:-noetic}
@@ -50,7 +50,7 @@ services:
       - ./${ROS_WORKSPACE:-ros1_workspace}/ros_logs:/root/.ros/log
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
     environment:
-      - DISPLAY=${DISPLAY:-host.docker.internal:0}
+      - DISPLAY=host.docker.internal:0
       - ROS_VERSION=${ROS_VERSION:-ros1}
       - ROS_WORKSPACE=${ROS_WORKSPACE:-ros1_workspace}
       - ROS_DISTRO=${ROS_DISTRO:-noetic}
@@ -91,7 +91,7 @@ services:
       - ./${ROS_WORKSPACE:-ros1_workspace}:/workspace/${ROS_WORKSPACE:-ros1_workspace}
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
     environment:
-      - DISPLAY=${DISPLAY:-host.docker.internal:0}
+      - DISPLAY=host.docker.internal:0
       - ROS_VERSION=${ROS_VERSION:-ros1}
       - ROS_WORKSPACE=${ROS_WORKSPACE:-ros1_workspace}
       - ROS_DISTRO=${ROS_DISTRO:-noetic}
@@ -100,6 +100,12 @@ services:
       - LIBGL_ALWAYS_SOFTWARE=1
       - QT_X11_NO_MITSHM=1
       - XDG_RUNTIME_DIR=/tmp/runtime-root
+      - QT_QPA_PLATFORM=xcb
+      - QT_DEBUG_PLUGINS=1
+      # OpenGL software rendering for macOS
+      - MESA_GL_VERSION_OVERRIDE=3.3
+      - MESA_GLSL_VERSION_OVERRIDE=330
+      - __GL_THREADED_OPTIMIZATIONS=0
     network_mode: host
     privileged: true
     depends_on:
@@ -118,6 +124,12 @@ services:
         if [ '${ROS_VERSION:-ros1}' = 'ros1' ]; then
           export LIBGL_ALWAYS_SOFTWARE=1 &&
           export XDG_RUNTIME_DIR=/tmp/runtime-root &&
+          export QT_QPA_PLATFORM=xcb &&
+          export QT_X11_NO_MITSHM=1 &&
+          export MESA_GL_VERSION_OVERRIDE=3.3 &&
+          export MESA_GLSL_VERSION_OVERRIDE=330 &&
+          export __GL_THREADED_OPTIMIZATIONS=0 &&
+          echo 'Testing X11 connection...' &&
           rviz -d src/fcu_core/rviz_cfg/fcu_core.rviz
         else
           echo 'ROS2 version not available yet'

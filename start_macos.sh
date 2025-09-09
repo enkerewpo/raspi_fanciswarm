@@ -52,10 +52,30 @@ if ! pgrep -x "Xquartz" > /dev/null; then
 else
     echo "XQuartz is running. Enabling X11 forwarding..."
     xhost +localhost
+    xhost +local:docker
 fi
 
-# Set display for Docker
+# Ensure X11 permissions are set correctly (before setting DISPLAY)
+echo "Setting up X11 permissions..."
+# Use the method from the GitHub gist for better compatibility
+xhost +localhost
+# Get hostname without .local suffix to avoid duplication
+HOSTNAME=$(hostname | sed 's/\.local$//')
+xhost +${HOSTNAME}.local
+
+# Set display for Docker (after xhost commands)
+# Use host.docker.internal:0 as recommended in the GitHub gist
 export DISPLAY=host.docker.internal:0
+echo "Using host.docker.internal:0 for X11 forwarding"
+
+# Test X11 connection before starting the full environment
+echo "Testing X11 connection..."
+if command -v xeyes >/dev/null 2>&1; then
+    echo "Testing with xeyes..."
+    timeout 3 xeyes >/dev/null 2>&1 && echo "✅ X11 connection successful!" || echo "⚠️  X11 test failed, but continuing..."
+else
+    echo "⚠️  xeyes not found, skipping X11 test"
+fi
 
 # Create ros_logs directory if it doesn't exist
 mkdir -p ./${ROS_WORKSPACE}/ros_logs
