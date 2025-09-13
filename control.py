@@ -282,13 +282,11 @@ class DroneController:
         if 'topics' in data:
             topics = data['topics']
             print(f"  {Colors.BOLD}ROS Topics ({len(topics)} total):{Colors.END}")
-            for topic in topics[:10]:  # Show first 10 topics
+            for topic in topics:  # Show all topics
                 name = topic.get('name', 'Unknown')
                 msg_type = topic.get('type', 'Unknown')
                 print(
                     f"    {Colors.CYAN}{name:<30}{Colors.END} {Colors.WHITE}{msg_type}{Colors.END}")
-            if len(topics) > 10:
-                print(f"    ... and {len(topics) - 10} more topics")
 
     def send_command(self, command):
         """Send command to server"""
